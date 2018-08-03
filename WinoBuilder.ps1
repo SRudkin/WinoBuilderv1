@@ -194,19 +194,21 @@ Set-ItemProperty -Path "hkcu:control panel\desktop" -Name "ScreenSaverIsSecure" 
 $workdir = "c:\installer\"
 
 # Check if work directory exists if not create it
-
+Function Create-Wordir {
 If (Test-Path -Path $workdir -PathType Container)
 { Write-Host "$workdir already exists" -ForegroundColor Red}
 ELSE
-{ New-Item -Path $workdir  -ItemType directory }
+{ New-Item -Path $workdir  -ItemType directory } }
 
-Write-Host "Firefox Installation" -ForegroundColor Black
+Function Download-Installer ($source, $name) {
+
+Write-Host "$name Installation" -ForegroundColor Black
 # Silent Install Firefox 
 # Download URL: https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US
 # Download the installer
 Write-Host "Downloading Installer" -ForegroundColor Black
 $source = "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
-$destination = "$workdir\firefox.exe"
+$destination = "$workdir\$name"
 
 # Check if Invoke-Webrequest exists otherwise execute WebClient
 
@@ -218,6 +220,7 @@ else
 {
     $WebClient = New-Object System.Net.WebClient
     $webclient.DownloadFile($source, $destination)
+}
 }
 sleep 30
 
