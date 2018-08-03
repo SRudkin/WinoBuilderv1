@@ -221,8 +221,10 @@ else
     $WebClient = New-Object System.Net.WebClient
     $webclient.DownloadFile($source, $destination)
 }
+sleep 30
 }
 sleep 30
+
 
 # Start the installation
 Write-Host "Starting Installation" -ForegroundColor Black
