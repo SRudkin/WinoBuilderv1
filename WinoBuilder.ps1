@@ -46,7 +46,7 @@ Function DisableCortana {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
 }
-
+DisableCortana 
 # Disable Application suggestions and automatic installation
 Function DisableAppSuggestions {
 	Write-Output "Disabling Application suggestions..."
@@ -65,7 +65,7 @@ Function DisableAppSuggestions {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Type DWord -Value 1
 }
-
+DisableAppSuggestions
 # Disable Location Tracking
 Function DisableLocationTracking {
 	Write-Output "Disabling Location Tracking..."
@@ -76,7 +76,7 @@ Function DisableLocationTracking {
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Type DWord -Value 0
 	Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" -Name "Status" -Type DWord -Value 0
 }
-
+DisableLocationTracking
 # Disable Feedback
 Function DisableFeedback {
 	Write-Output "Disabling Feedback..."
@@ -88,7 +88,7 @@ Function DisableFeedback {
 	Disable-ScheduledTask -TaskName "Microsoft\Windows\Feedback\Siuf\DmClient" -ErrorAction SilentlyContinue | Out-Null
 	Disable-ScheduledTask -TaskName "Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" -ErrorAction SilentlyContinue | Out-Null
 }
-
+DisableFeedback
 #Disable Diagnostics and Tracking
 
 Function DisableDiagTrack {
@@ -96,13 +96,13 @@ Function DisableDiagTrack {
 	Stop-Service "DiagTrack" -WarningAction SilentlyContinue
 	Set-Service "DiagTrack" -StartupType Disabled
 }
-
+DisableDiagTrack
 # Enable Firewall
 Function EnableFirewall {
 	Write-Output "Enabling Firewall..."
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile" -Name "EnableFirewall" -ErrorAction SilentlyContinue
 }
-
+EnableFirewall
 # Enable offering of drivers through Windows Update
 Function EnableUpdateDriver {
 	Write-Output "Enabling driver offering through Windows Update..."
@@ -112,7 +112,7 @@ Function EnableUpdateDriver {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverSearching" -Name "DriverUpdateWizardWuSearchEnabled" -ErrorAction SilentlyContinue
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "ExcludeWUDriversInQualityUpdate" -ErrorAction SilentlyContinue
 }
-
+EnableUpdateDriver
 # Enable NumLock after startup
 Function EnableNumlock {
 	Write-Output "Enabling NumLock after startup..."
@@ -126,7 +126,7 @@ Function EnableNumlock {
 		$wsh.SendKeys('{NUMLOCK}')
 	}
 }
-
+EnableNumlock
 # Disable OneDrive
 Function DisableOneDrive {
 	Write-Output "Disabling OneDrive..."
@@ -135,7 +135,7 @@ Function DisableOneDrive {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Name "DisableFileSyncNGSC" -Type DWord -Value 1
 }
-
+DisableOneDrive 
 # Uninstall default Microsoft applications
 Function UninstallMsftBloat {
 	Write-Output "Uninstalling default Microsoft applications..."
@@ -171,7 +171,7 @@ Function UninstallMsftBloat {
 	Get-AppxPackage "Microsoft.ZuneMusic" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.ZuneVideo" | Remove-AppxPackage
 }
-
+UninstallMsftBloat
 
 #Set screen lockout
 Set-ItemProperty -Path "hkcu:control panel\desktop" -Name "ScreenSaveActive" -Value 1
