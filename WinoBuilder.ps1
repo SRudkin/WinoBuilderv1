@@ -46,7 +46,7 @@ Function DisableCortana {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Type DWord -Value 0
 }
-DisableCortana 
+DisableCortana
 # Disable Application suggestions and automatic installation
 Function DisableAppSuggestions {
 	Write-Output "Disabling Application suggestions..."
@@ -65,7 +65,7 @@ Function DisableAppSuggestions {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Type DWord -Value 1
 }
-DisableAppSuggestions
+
 # Disable Location Tracking
 Function DisableLocationTracking {
 	Write-Output "Disabling Location Tracking..."
@@ -102,7 +102,7 @@ Function EnableFirewall {
 	Write-Output "Enabling Firewall..."
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile" -Name "EnableFirewall" -ErrorAction SilentlyContinue
 }
-EnableFirewall
+
 # Enable offering of drivers through Windows Update
 Function EnableUpdateDriver {
 	Write-Output "Enabling driver offering through Windows Update..."
@@ -112,7 +112,7 @@ Function EnableUpdateDriver {
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DriverSearching" -Name "DriverUpdateWizardWuSearchEnabled" -ErrorAction SilentlyContinue
 	Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "ExcludeWUDriversInQualityUpdate" -ErrorAction SilentlyContinue
 }
-EnableUpdateDriver
+EnableUpdateDriver 
 # Enable NumLock after startup
 Function EnableNumlock {
 	Write-Output "Enabling NumLock after startup..."
@@ -135,7 +135,7 @@ Function DisableOneDrive {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" -Name "DisableFileSyncNGSC" -Type DWord -Value 1
 }
-DisableOneDrive 
+DisableOneDrive
 # Uninstall default Microsoft applications
 Function UninstallMsftBloat {
 	Write-Output "Uninstalling default Microsoft applications..."
@@ -171,7 +171,7 @@ Function UninstallMsftBloat {
 	Get-AppxPackage "Microsoft.ZuneMusic" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.ZuneVideo" | Remove-AppxPackage
 }
-UninstallMsftBloat
+UninstallMsftBloat 
 
 #Set screen lockout
 Set-ItemProperty -Path "hkcu:control panel\desktop" -Name "ScreenSaveActive" -Value 1
@@ -189,72 +189,24 @@ Set-ItemProperty -Path "hkcu:control panel\desktop" -Name "ScreenSaverIsSecure" 
 #Begin application installations
 # Path for the workdirectory where the installers will be downloaded and executed from
 # The workflow is download installer to C:\installer\, execute installer silently, delete installer
-# Applications included are firefox, crashplan and zoom
+# Applications included are firefox, crashplan and vidyo
 
 $workdir = "c:\installer\"
-$Owner = "SRudkin"
-$Repository = "WinoBuilderv1" 
-$Path = "policies.json"
 
-#Download the policies from github 
-
-function DownloadFilesFromRepo {
-Param(
-    [string]$Owner,
-    [string]$Repository,
-    [string]$Path,
-    [string]$workdir
-  
-    )
-
-    $baseUri = "https://api.github.com/"
-    $args = "repos/$Owner/$Repository/contents/$Path"
-    $wr = Invoke-WebRequest -Uri $($baseuri+$args)
-    $objects = $wr.Content | ConvertFrom-Json
-    $files = $objects | where {$_.type -eq "file"} | Select -exp download_url
-    $directories = $objects | where {$_.type -eq "dir"}
-    
-    $directories | ForEach-Object { 
-        DownloadFilesFromRepo -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath $($workdir+$_.name)
-    }
-
-    
-    if (-not (Test-Path $workdir)) {
-        # Destination path does not exist, let's create it
-        try {
-            New-Item -Path $workdir -ItemType Directory -ErrorAction Stop
-        } catch {
-            throw "Could not create path '$workdir'!"
-        }
-    }
-
-    foreach ($file in $files) {
-       $workdir= Join-Path $workdir (Split-Path $file -Leaf)
-        try {
-            Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop -Verbose
-            "Grabbed '$($file)' to '$fileDestination'"
-        } catch {
-            throw "Unable to download '$($file.path)'"
-        }
-    }
-
-}
-DownloadFilesFromRepo
 # Check if work directory exists if not create it
-Function Create-Workdir {
+
 If (Test-Path -Path $workdir -PathType Container)
 { Write-Host "$workdir already exists" -ForegroundColor Red}
 ELSE
-{ New-Item -Path $workdir  -ItemType directory } }
-Create-Workdir
+{ New-Item -Path $workdir  -ItemType directory }
 
-Write-Host "$name Installation" -ForegroundColor Black
+Write-Host "Firefox Installation" -ForegroundColor Black
 # Silent Install Firefox 
 # Download URL: https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US
 # Download the installer
 Write-Host "Downloading Installer" -ForegroundColor Black
 $source = "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
-$destination = "$workdir\$name"
+$destination = "$workdir\firefox.exe"
 
 # Check if Invoke-Webrequest exists otherwise execute WebClient
 
@@ -268,9 +220,6 @@ else
     $webclient.DownloadFile($source, $destination)
 }
 sleep 30
-}
-sleep 30
-
 
 # Start the installation
 Write-Host "Starting Installation" -ForegroundColor Black
@@ -284,12 +233,12 @@ rm -Force $workdir\firefox*
 #Add bookmarks from policies.json
 Write-Host "adding bookmarks" -ForegroundColor Black
 New-Item -Path "C:\Program Files\Mozilla Firefox\distribution"  -ItemType directory
-#creating distribution folder
-Copy-Item $Workdir\policies.json -Destination "C:\Program Files\Mozilla Firefox\distribution"
+#creating distruition folder
+Copy-Item D:\setup\policies.json -Destination "C:\Program Files\Mozilla Firefox\distribution"
 sleep 30
 
 #Silent Install Vidyo 
-Write-Host "Downloading Zoom Installer" -ForegroundColor Black
+Write-Host "Downloading Vidyo Installer" -ForegroundColor Black
 #Download URL= http://zoom.us/client/latest/ZoomInstaller.exe
 
 # Download the installer
@@ -315,7 +264,7 @@ Start-Process -FilePath "$workdir\zoom.exe" -ArgumentList "/S"
 sleep 30
 
 # Remove the installer
-Write-Host "Deleting Vidyo Installer" -ForegroundColor Black
+Write-Host "Deleting Zoom Installer" -ForegroundColor Black
 rm -Force $workdir\zoom*
 
 #Set Desktop background to Dino
@@ -380,6 +329,3 @@ Read-Host "Press Enter to Continue to reboot"
 Write-Host "continueing" -ForegroundColor Black
 
 Restart-Computer
-
-
-
