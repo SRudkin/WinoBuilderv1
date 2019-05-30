@@ -189,12 +189,59 @@ Set-ItemProperty -Path "hkcu:control panel\desktop" -Name "ScreenSaverIsSecure" 
 #Begin application installations
 # Path for the workdirectory where the installers will be downloaded and executed from
 # The workflow is download installer to C:\installer\, execute installer silently, delete installer
-# Applications included are firefox, crashplan and vidyo
+# Applications included are firefox, crashplan and zoom
 
 $workdir = "c:\installer\"
+$Owner = "SRudkin"
+$Repository = "WinoBuilderv1" 
+$Path = "policies.json"
+
+#Download the policies from github 
+
+function DownloadFilesFromRepo {
+Param(
+    [string]$Owner,
+    [string]$Repository,
+    [string]$Path,
+    [string]$workdir
+  
+    )
+
+    $baseUri = "https://api.github.com/"
+    $args = "repos/$Owner/$Repository/contents/$Path"
+    $wr = Invoke-WebRequest -Uri $($baseuri+$args)
+    $objects = $wr.Content | ConvertFrom-Json
+    $files = $objects | where {$_.type -eq "file"} | Select -exp download_url
+    $directories = $objects | where {$_.type -eq "dir"}
+    
+    $directories | ForEach-Object { 
+        DownloadFilesFromRepo -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath $($workdir+$_.name)
+    }
+
+    
+    if (-not (Test-Path $workdir)) {
+        # Destination path does not exist, let's create it
+        try {
+            New-Item -Path $workdir -ItemType Directory -ErrorAction Stop
+        } catch {
+            throw "Could not create path '$workdir'!"
+        }
+    }
+
+    foreach ($file in $files) {
+       $workdir= Join-Path $workdir (Split-Path $file -Leaf)
+        try {
+            Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop -Verbose
+            "Grabbed '$($file)' to '$fileDestination'"
+        } catch {
+            throw "Unable to download '$($file.path)'"
+        }
+    }
+
+}
 
 # Check if work directory exists if not create it
-Function Create-Wordir {
+Function Create-Workdir {
 If (Test-Path -Path $workdir -PathType Container)
 { Write-Host "$workdir already exists" -ForegroundColor Red}
 ELSE
@@ -238,17 +285,17 @@ rm -Force $workdir\firefox*
 #Add bookmarks from policies.json
 Write-Host "adding bookmarks" -ForegroundColor Black
 New-Item -Path "C:\Program Files\Mozilla Firefox\distribution"  -ItemType directory
-#creating distruition folder
-Copy-Item D:\setup\policies.json -Destination "C:\Program Files\Mozilla Firefox\distribution"
+#creating distribution folder
+Copy-Item $Workdir\policies.json -Destination "C:\Program Files\Mozilla Firefox\distribution"
 sleep 30
 
 #Silent Install Vidyo 
-Write-Host "Downloading Vidyo Installer" -ForegroundColor Black
-#Download URL= https://v.mozilla.com/upload/VidyoDesktopAdminInstaller-win32-TAG_VD_3_6_14_0003.exe
+Write-Host "Downloading Zoom Installer" -ForegroundColor Black
+#Download URL= http://zoom.us/client/latest/ZoomInstaller.exe
 
 # Download the installer
-$source = "https://v.mozilla.com/upload/VidyoDesktopAdminInstaller-win32-TAG_VD_3_6_14_0003.exe" 
-$destination = "$workdir\vidyo.exe"
+$source = "http://zoom.us/client/latest/ZoomInstaller.exe" 
+$destination = "$workdir\zoom.exe"
 
 # Check if Invoke-Webrequest exists otherwise execute WebClient
 
@@ -265,12 +312,12 @@ sleep 30
 
 # Start the installation
 Write-Host "Starting Installation" -ForegroundColor Black
-Start-Process -FilePath "$workdir\vidyo.exe" -ArgumentList "/S"
+Start-Process -FilePath "$workdir\zoom.exe" -ArgumentList "/S"
 sleep 30
 
 # Remove the installer
 Write-Host "Deleting Vidyo Installer" -ForegroundColor Black
-rm -Force $workdir\vidyo*
+rm -Force $workdir\zoom*
 
 #Set Desktop background to Dino
 
