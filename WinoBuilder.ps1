@@ -171,6 +171,7 @@ Function UninstallMsftBloat {
 	Get-AppxPackage "Microsoft.ZuneMusic" | Remove-AppxPackage
 	Get-AppxPackage "Microsoft.ZuneVideo" | Remove-AppxPackage
 }
+Write-Host "Uninstalling Bloatware"
 UninstallMsftBloat 
 
 #Set screen lockout
@@ -204,7 +205,7 @@ Write-Host "Firefox Installation" -ForegroundColor Black
 # Silent Install Firefox 
 # Download URL: https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US
 # Download the installer
-Write-Host "Downloading Installer" -ForegroundColor Black
+Write-Host "Downloading Firefox Installer" -ForegroundColor Black
 $source = "https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US"
 $destination = "$workdir\firefox.exe"
 
@@ -222,23 +223,23 @@ else
 sleep 30
 
 # Start the installation
-Write-Host "Starting Installation" -ForegroundColor Black
+Write-Host "Starting Firefox Installation" -ForegroundColor Black
 Start-Process -FilePath "$workdir\firefox.exe" -ArgumentList "/S"
 sleep 30
 
 # Remove the installer
-Write-Host "deleting installer" -ForegroundColor Black
+Write-Host "deleting Firefox installer" -ForegroundColor Black
 rm -Force $workdir\firefox*
 
 #Add bookmarks from policies.json
-Write-Host "adding bookmarks" -ForegroundColor Black
+Write-Host "adding Firefox bookmarks" -ForegroundColor Black
 New-Item -Path "C:\Program Files\Mozilla Firefox\distribution"  -ItemType directory
 #creating distruition folder
 Copy-Item D:\setup\policies.json -Destination "C:\Program Files\Mozilla Firefox\distribution"
 sleep 30
 
 #Silent Install Vidyo 
-Write-Host "Downloading Vidyo Installer" -ForegroundColor Black
+Write-Host "Downloading Zoom Installer" -ForegroundColor Black
 #Download URL= http://zoom.us/client/latest/ZoomInstaller.exe
 
 # Download the installer
@@ -259,7 +260,7 @@ else
 sleep 30
 
 # Start the installation
-Write-Host "Starting Installation" -ForegroundColor Black
+Write-Host "Starting Zoom Installation" -ForegroundColor Black
 Start-Process -FilePath "$workdir\zoom.exe" -ArgumentList "/S"
 sleep 30
 
@@ -289,7 +290,7 @@ set-WallPaper -value "C:/installer/dino.png"
 # Download URL:https://download.code42.com/installs/win/install/Code42CrashPlan/jre/Code42CrashPlan_6.7.2_Win64.msi
 
 # Download the installer
-Write-Host "Downloading Installer" -ForegroundColor Black
+Write-Host "Downloading Crashplan Installer" -ForegroundColor Black
 $source = "https://download.code42.com/installs/win/install/Code42CrashPlan/jre/Code42CrashPlan_6.7.2_Win64.msi"
 $destination = "$workdir\crashplan.msi"
 
@@ -307,6 +308,7 @@ else
 sleep 30
 
 #install crashplan
+Write-Host "Installing Crashplan Installer"
 Start-Process -FilePath "$workdir\crashplan.msi" -ArgumentList "/passive"
 sleep 30
 
