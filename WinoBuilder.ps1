@@ -65,7 +65,7 @@ Function DisableAppSuggestions {
 	}
 	Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Type DWord -Value 1
 }
-
+DisableAppSuggestions
 # Disable Location Tracking
 Function DisableLocationTracking {
 	Write-Output "Disabling Location Tracking..."
@@ -321,11 +321,11 @@ rm -Force $workdir\crashplan*
 #Begin Bitlocker - GPU 
 
 #Enable Bitlocker
-Copy-Item "D:\setup\recoverykey.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
+#Copy-Item "D:\setup\recoverykey.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
 
 #Add Batfle to Startup Folder
 
-Copy-Item "D:\setup\recoverykey.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
+#Copy-Item "D:\setup\recoverykey.bat" -Destination "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
 
 Read-Host "Press Enter to Continue to reboot"
 Write-Host "continueing" -ForegroundColor Black
